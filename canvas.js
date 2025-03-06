@@ -45,9 +45,6 @@ let visibleWidth = 0, visibleHeight = 0;
 // Forzamos _dpr a 1 para que el tamaño interno sea igual al tamaño visual
 let _dpr = 1;
 
-// Variable que determina si se aplican cambios específicos para móviles
-let mobileMultiplier = 1;
-
 // Arreglos para datos de las gráficas
 let timeData = [];
 let errorXData = [];
@@ -65,7 +62,7 @@ function updateCanvasSize() {
     visibleWidth = container.clientWidth;
     visibleHeight = visibleWidth * (3 / 4);
     
-    // Establece el tamaño visual (CSS) del canvas
+    // Tamaño visual (CSS) del canvas
     canvas.style.width = visibleWidth + 'px';
     canvas.style.height = visibleHeight + 'px';
     
@@ -76,9 +73,6 @@ function updateCanvasSize() {
     ctx.resetTransform();
     ctx.scale(_dpr, _dpr); // Aquí _dpr es 1
     ctx.imageSmoothingEnabled = true;
-    
-    // Se define mobileMultiplier según el ancho de pantalla:
-    mobileMultiplier = visibleWidth < 600 ? 0.5 : 1;
     
     // El ancho real es igual a visibleWidth
     const actualWidth = canvas.width;
@@ -144,7 +138,7 @@ function drawAllElements() {
   // Mapea el área de simulación al canvas 1:1
   let scaleFactor = actualWidth / SIM_WIDTH;
   
-  // Centro del canvas (sin offsets adicionales)
+  // Centro del canvas
   const cx = actualWidth / 2;
   const cy = actualHeight / 2;
   
@@ -152,7 +146,7 @@ function drawAllElements() {
   // invirtiendo el eje Y para que los valores positivos suban.
   ctx.setTransform(scaleFactor, 0, 0, -scaleFactor, cx, cy);
   
-  // Fondo degradado (opcional)
+  // Dibuja un fondo degradado (puedes cambiarlo si lo prefieres)
   ctx.save();
   const grd = ctx.createLinearGradient(SIM_X_MIN, SIM_Y_MIN, SIM_X_MAX, SIM_Y_MAX);
   grd.addColorStop(0, '#ffffff');
@@ -226,12 +220,18 @@ function drawGrid() {
 
 function drawRobot() {
   const pos = robot.getCurrentPosition();
+  // Calcula el punto de extensión (extremo derecho) usando la función getExtensionPoint()
+  // Aunque no lo usamos directamente para la transformación, lo usaremos para alinear la imagen.
   ctx.save();
   ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
   ctx.shadowBlur = 10;
+  // Traslada al robot
   ctx.translate(pos.x, pos.y);
   ctx.rotate(robot.theta);
-  ctx.drawImage(robotImg, -config.robotWidth / 2, -config.robotHeight / 2, config.robotWidth, config.robotHeight);
+  // Dibujar la imagen de modo que su extremo derecho coincida con el punto de extensión dinámica.
+  // En coordenadas locales, el punto de extensión debe estar en (robot.l, 0).
+  // Para lograrlo, se dibuja la imagen en x = robot.l - config.robotWidth.
+  ctx.drawImage(robotImg, robot.l - config.robotWidth, -config.robotHeight / 2, config.robotWidth, config.robotHeight);
   ctx.restore();
 }
 
@@ -241,7 +241,7 @@ function drawTrajectory() {
   ctx.save();
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
-  // Se reduce el grosor de la trayectoria a 3/scaleFactor
+  // Se reduce el grosor de la línea a 3/scaleFactor para que sea similar al de las gráficas
   ctx.lineWidth = 3 / scaleFactor;
   // Trazo en rojo constante
   ctx.strokeStyle = '#ff0000';
@@ -266,22 +266,18 @@ function drawPointsCircles() {
   drawCircle(extPoint.x, extPoint.y, '#FF0000');
 }
 
-// Se reduce aún más el radio de los puntos para que sean más pequeños en móviles
+// Se reduce aún más el radio de los puntos: ahora se usa 3/scaleFactor
 function drawCircle(x, y, color) {
   ctx.beginPath();
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
-  // Para móviles, el mobileMultiplier ya vale 0.5; pero aquí queremos aplicar el factor siempre
-  // Así, se usa 3/scaleFactor para móviles y 6/scaleFactor para escritorio.
-  // Usamos: radio = (visibleWidth < 600 ? 3 : 6) / scaleFactor.
-  const radio = (visibleWidth < 600 ? 3 : 6) / scaleFactor;
-  ctx.arc(x, y, radio, 0, Math.PI * 2);
+  ctx.arc(x, y, 3 / scaleFactor, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
 }
 
 function drawPointsLabels() {
-  // Para las etiquetas, se reduce el tamaño de fuente a la mitad solo en móvil
+  // Para las etiquetas, reducimos el tamaño de fuente a la mitad respecto a la versión original
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
   const cx = actualWidth / 2;
@@ -299,9 +295,7 @@ function drawPointsLabels() {
   
   ctx.save();
   ctx.resetTransform();
-  // Si es móvil, usamos 14px; en escritorio, 28px.
-  const fontSize = visibleWidth < 600 ? 14 : 28;
-  ctx.font = `bold ${fontSize}px Arial`;
+  ctx.font = 'bold 14px Arial'; // Se reduce de 28px a 14px
   ctx.fillStyle = '#000000';
   ctx.fillText('(Xo, Yo)', startCanvasX + 10, startCanvasY - 10);
   ctx.fillText('(Xs, Ys)', endCanvasX + 10, endCanvasY - 10);
