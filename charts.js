@@ -4,6 +4,7 @@ function initCharts(timeData, errorXData, errorYData, posXData, posYData, VData,
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: { duration: 0 }, // Actualización instantánea (sin animación)
     scales: {
       x: {
         title: { display: true, text: 'Tiempo (s)' },
@@ -81,7 +82,6 @@ function initCharts(timeData, errorXData, errorYData, posXData, posYData, VData,
     options: commonOptions
   });
 
-  // En la gráfica de control ya no se fija el rango del eje y, se ajusta automáticamente
   controlChart = new Chart(document.getElementById('controlChart').getContext('2d'), {
     type: 'line',
     data: {
@@ -110,6 +110,7 @@ function initCharts(timeData, errorXData, errorYData, posXData, posYData, VData,
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 0 }, // Actualización instantánea
       scales: {
         x: {
           title: { display: true, text: 'Tiempo (s)' },
@@ -122,7 +123,6 @@ function initCharts(timeData, errorXData, errorYData, posXData, posYData, VData,
         y: {
           title: { display: true, text: 'Valor' },
           grid: { display: false }
-          // Se eliminan los valores fijos de min y max para que se ajuste automáticamente
         }
       },
       plugins: {
