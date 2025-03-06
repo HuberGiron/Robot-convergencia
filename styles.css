@@ -11,6 +11,17 @@ body {
   color: #333;
 }
 
+/* Limitar el ancho de las cajas de contenido */
+.info-boxes {
+  width: 90%;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .info-boxes {
+    width: 80%;
+  }
+}
+
 .controls {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -147,6 +158,63 @@ input {
   margin-top: 10px;
   font-size: 1rem;
   color: #333;
+}
+
+/* Cajas de contenido desplegables para la introducción, diagrama y fórmulas */
+.info-boxes details {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.info-boxes summary {
+  cursor: pointer;
+  padding: 5px;
+  background-color: #cc0000;  /* Fondo rojo */
+  color: #fff;                /* Texto blanco */
+}
+
+.info-boxes p,
+.info-boxes ul {
+  margin: 10px 0;
+}
+
+/* Estilos para la sección del diagrama */
+.diagram-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (min-width: 768px) {
+  .diagram-container {
+    flex-direction: row;
+    align-items: center;
+  }
+  .diagram-text {
+    flex: 1;
+  }
+  .diagram-image {
+    flex: 1;
+    max-width: 50%;
+    background-color: #fff; /* Fondo blanco para la imagen */
+    text-align: center;
+  }
+}
+.diagram-box img,
+.diagram-image img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+
+/* Clase para ecuaciones con MathJax, tamaño intermedio */
+.math-equation {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin: 1em 0;
+  text-align: center;
 }
 
 /* Ajustes responsivos para los controles */

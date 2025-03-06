@@ -5,11 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Robot Móvil - Simulación</title>
   <link rel="stylesheet" href="styles.css" />
+  <!-- Configuración de MathJax para ecuaciones en LaTeX -->
+  <script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      fontCache: 'global'
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <h1>Modelo Cinemático Robot Móvil</h1>
   <h2>Convergencia Uniciclo</h2>
   
+  <!-- Sección de cajas de contenido desplegables -->
+  <section class="info-boxes">
+    <!-- Introducción -->
+    <details open>
+      <summary>Introducción</summary>
+      <p>
+        Esta simulación ilustra la cinemática de robots móviles. El robot, cuya posición inicial se denota como <em>Xₒ</em> y <em>Yₒ</em> y cuya orientación es <em>Θ</em>, se desplaza hacia una posición deseada, denotada como <em>Xₛ</em> y <em>Yₛ</em>. El sistema de control actúa para minimizar el error entre la posición actual y la deseada, logrando que el robot converja de forma estable.
+      </p>
+    </details>
+    
+    <!-- Diagrama Cinemático -->
+    <details>
+      <summary>Diagrama Cinemático y de Convergencia</summary>
+      <div class="diagram-container">
+        <div class="diagram-text">
+          <p>
+            El diagrama muestra la configuración del robot:
+          </p>
+          <ul>
+            <li>Posición inicial: (<em>Xₒ</em>, <em>Yₒ</em>) y orientación <em>Θ</em>.</li>
+            <li>Posición deseada: (<em>Xₛ</em>, <em>Yₛ</em>).</li>
+            <li>Punto de extensión dinámica (<em>α</em>): Ubicado a una distancia <em>l</em> del centro del robot, se representa mediante las coordenadas (<em>p</em>, <em>q</em>).</li>
+          </ul>
+          <p>
+            Este diagrama ilustra cómo se utiliza el punto <em>α</em> para calcular el error y ajustar las velocidades.
+          </p>
+        </div>
+        <div class="diagram-image">
+          <img src="diagrama.png" alt="Diagrama Cinemático y de Convergencia" />
+        </div>
+      </div>
+    </details>
+    
+    <!-- Fórmulas de Control -->
+    <details>
+      <summary>Fórmulas de Control</summary>
+      <div class="equations">
+        <div class="equation">
+          <p>Error de Posición:</p>
+          <p class="math-equation" style="text-align: center;">
+$$ 
+\begin{pmatrix} 
+e_x \\[0.3em]
+e_y 
+\end{pmatrix} 
+=
+\begin{pmatrix} 
+p - X_s \\[0.3em]
+q - Y_s 
+\end{pmatrix}
+$$
+          </p>
+        </div>
+        <div class="equation">
+          <p>Cálculo del Punto de Extensión Dinámica (α):</p>
+          <p class="math-equation" style="text-align: center;">
+$$ 
+p = X_o + l \cdot \cos(\Theta)
+$$
+$$ 
+q = Y_o + l \cdot \sin(\Theta)
+$$
+          </p>
+        </div>
+        <div class="equation">
+          <p>Acción de Control:</p>
+          <p class="math-equation" style="text-align: center;">
+$$ 
+\begin{pmatrix} 
+V \\[0.3em]
+W 
+\end{pmatrix} 
+=
+A^{-1} 
+\begin{pmatrix} 
+-k\, e_x \\[0.3em]
+-k\, e_y 
+\end{pmatrix}
+$$
+          </p>
+          <p>
+            donde <em>k</em> es la ganancia de control y <em>A</em> es una matriz dependiente de <em>Θ</em> y <em>l</em>.
+          </p>
+        </div>
+      </div>
+    </details>
+  </section>
+  
+  <!-- Controles de simulación -->
   <div class="controls">
     <div class="variable-inputs">
       <label for="startX">X Inicial (mm):</label>

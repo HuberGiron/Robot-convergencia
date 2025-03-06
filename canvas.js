@@ -60,7 +60,7 @@ function updateCanvasSize() {
   if (container) {
     _dpr = 1; // Forzamos _dpr a 1
     visibleWidth = container.clientWidth;
-    visibleHeight = visibleWidth * (3 / 4);
+    visibleHeight = visibleWidth * (.68);
     
     // Tamaño visual (CSS) del canvas
     canvas.style.width = visibleWidth + 'px';
