@@ -20,11 +20,11 @@ function updateRobotImage() {
 const canvas = document.getElementById('robotCanvas');
 const ctx = canvas.getContext('2d');
 
-// Sistema de simulación fijo
-const SIM_X_MIN = -400, SIM_X_MAX = 400;
-const SIM_Y_MIN = -300, SIM_Y_MAX = 300;
-const SIM_WIDTH = SIM_X_MAX - SIM_X_MIN;   // 800 mm
-const SIM_HEIGHT = SIM_Y_MAX - SIM_Y_MIN;    // 600 mm
+// Área de simulación: eje X de -300 a 300 y eje Y de -200 a 200
+const SIM_X_MIN = -300, SIM_X_MAX = 300;
+const SIM_Y_MIN = -200, SIM_Y_MAX = 200;
+const SIM_WIDTH = SIM_X_MAX - SIM_X_MIN;   // 600
+const SIM_HEIGHT = SIM_Y_MAX - SIM_Y_MIN;    // 400
 
 // Dimensiones originales del robot (en mm)
 const originalRobotWidth = 150; // Valor original para robotWidth
@@ -146,7 +146,7 @@ function drawAllElements() {
   // invirtiendo el eje Y para que los valores positivos suban.
   ctx.setTransform(scaleFactor, 0, 0, -scaleFactor, cx, cy);
   
-  // Dibuja un fondo degradado (puedes cambiarlo si lo prefieres)
+  // Dibuja un fondo degradado (opcional)
   ctx.save();
   const grd = ctx.createLinearGradient(SIM_X_MIN, SIM_Y_MIN, SIM_X_MAX, SIM_Y_MAX);
   grd.addColorStop(0, '#ffffff');
@@ -177,7 +177,8 @@ function drawGrid() {
   ctx.fillStyle = '#000000';
   
   const margin = 20;
-  const divisions = (window.innerWidth >= 768) ? 5 : 4;
+  // Ahora usamos divisiones: 4 en escritorio y 3 en móvil
+  const divisions = (window.innerWidth >= 768) ? 4 : 3;
   const stepX = SIM_WIDTH / (2 * divisions);
   const stepY = SIM_HEIGHT / (2 * divisions);
   
@@ -220,17 +221,13 @@ function drawGrid() {
 
 function drawRobot() {
   const pos = robot.getCurrentPosition();
-  // Calcula el punto de extensión (extremo derecho) usando la función getExtensionPoint()
-  // Aunque no lo usamos directamente para la transformación, lo usaremos para alinear la imagen.
   ctx.save();
   ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
   ctx.shadowBlur = 10;
-  // Traslada al robot
   ctx.translate(pos.x, pos.y);
   ctx.rotate(robot.theta);
-  // Dibujar la imagen de modo que su extremo derecho coincida con el punto de extensión dinámica.
-  // En coordenadas locales, el punto de extensión debe estar en (robot.l, 0).
-  // Para lograrlo, se dibuja la imagen en x = robot.l - config.robotWidth.
+  // Se dibuja la imagen de modo que su extremo derecho coincida con el punto de extensión dinámica.
+  // Se dibuja la imagen en x = robot.l - config.robotWidth.
   ctx.drawImage(robotImg, robot.l - config.robotWidth, -config.robotHeight / 2, config.robotWidth, config.robotHeight);
   ctx.restore();
 }
@@ -241,7 +238,7 @@ function drawTrajectory() {
   ctx.save();
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
-  // Se reduce el grosor de la línea a 3/scaleFactor para que sea similar al de las gráficas
+  // Grosor de la línea de trayectoria: 3/scaleFactor
   ctx.lineWidth = 3 / scaleFactor;
   // Trazo en rojo constante
   ctx.strokeStyle = '#ff0000';
@@ -266,7 +263,7 @@ function drawPointsCircles() {
   drawCircle(extPoint.x, extPoint.y, '#FF0000');
 }
 
-// Se reduce aún más el radio de los puntos: ahora se usa 3/scaleFactor
+// Se reduce el radio de los puntos a 3/scaleFactor
 function drawCircle(x, y, color) {
   ctx.beginPath();
   const actualWidth = canvas.width;
@@ -277,7 +274,7 @@ function drawCircle(x, y, color) {
 }
 
 function drawPointsLabels() {
-  // Para las etiquetas, reducimos el tamaño de fuente a la mitad respecto a la versión original
+  // Para las etiquetas, usamos fuente 'bold 14px Arial'
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
   const cx = actualWidth / 2;
@@ -295,7 +292,7 @@ function drawPointsLabels() {
   
   ctx.save();
   ctx.resetTransform();
-  ctx.font = 'bold 14px Arial'; // Se reduce de 28px a 14px
+  ctx.font = 'bold 14px Arial';
   ctx.fillStyle = '#000000';
   ctx.fillText('(Xo, Yo)', startCanvasX + 10, startCanvasY - 10);
   ctx.fillText('(Xs, Ys)', endCanvasX + 10, endCanvasY - 10);
