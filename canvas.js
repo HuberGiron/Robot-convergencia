@@ -58,30 +58,22 @@ let WData = [];
 function updateCanvasSize() {
   const container = document.querySelector('.canvas-container');
   if (container) {
-    _dpr = 1; // Forzamos _dpr a 1
+    _dpr = 1;
     visibleWidth = container.clientWidth;
-    visibleHeight = visibleWidth * (.68);
-    
-    // Tamaño visual (CSS) del canvas
+    visibleHeight = visibleWidth * (0.68);  // Ajustado a 0.68
+
     canvas.style.width = visibleWidth + 'px';
     canvas.style.height = visibleHeight + 'px';
-    
-    // Tamaño interno del canvas (igual al tamaño visual)
+
     canvas.width = visibleWidth;
     canvas.height = visibleHeight;
-    
+
     ctx.resetTransform();
-    ctx.scale(_dpr, _dpr); // Aquí _dpr es 1
+    ctx.scale(_dpr, _dpr);
     ctx.imageSmoothingEnabled = true;
-    
-    // El ancho real es igual a visibleWidth
+
     const actualWidth = canvas.width;
-    
-    // Selecciona la referencia de acuerdo al tamaño del contenedor:
-    // Si es versión móvil (ancho menor a 600), se usa 450; en escritorio, 900.
     const referenceValue = visibleWidth < 600 ? 450 : 900;
-    
-    // Ajusta el tamaño del robot proporcionalmente
     config.robotWidth = originalRobotWidth * (actualWidth / referenceValue);
     if (robotImg.complete) {
       config.robotHeight = robotImg.height * config.robotWidth / robotImg.width;
@@ -90,7 +82,6 @@ function updateCanvasSize() {
   }
 }
 
-// Debounce en el resize para evitar llamadas excesivas
 let resizeTimeout;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
@@ -130,23 +121,15 @@ function updatePreview() {
 
 function drawAllElements() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // El área de dibujo es igual al tamaño del canvas
+
   const actualWidth = canvas.width;
   const actualHeight = canvas.height;
-  
-  // Mapea el área de simulación al canvas 1:1
   let scaleFactor = actualWidth / SIM_WIDTH;
-  
-  // Centro del canvas
   const cx = actualWidth / 2;
   const cy = actualHeight / 2;
-  
-  // Configura la transformación: se mapea el sistema de simulación al canvas,
-  // invirtiendo el eje Y para que los valores positivos suban.
+
   ctx.setTransform(scaleFactor, 0, 0, -scaleFactor, cx, cy);
-  
-  // Dibuja un fondo degradado (opcional)
+
   ctx.save();
   const grd = ctx.createLinearGradient(SIM_X_MIN, SIM_Y_MIN, SIM_X_MAX, SIM_Y_MAX);
   grd.addColorStop(0, '#ffffff');
@@ -154,16 +137,15 @@ function drawAllElements() {
   ctx.fillStyle = grd;
   ctx.fillRect(SIM_X_MIN, SIM_Y_MIN, SIM_WIDTH, SIM_HEIGHT);
   ctx.restore();
-  
+
   drawGrid();
   drawTrajectory();
   drawRobot();
   drawPointsCircles();
-  
-  // Restablece la transformación para dibujar etiquetas sin transformación
+
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   drawPointsLabels();
-  
+
   updateRobotInfo();
 }
 
@@ -175,13 +157,12 @@ function drawGrid() {
   ctx.lineWidth = 1 / scaleFactor;
   ctx.font = '14px Arial';
   ctx.fillStyle = '#000000';
-  
+
   const margin = 20;
-  // Ahora usamos divisiones: 4 en escritorio y 3 en móvil
   const divisions = (window.innerWidth >= 768) ? 4 : 3;
   const stepX = SIM_WIDTH / (2 * divisions);
   const stepY = SIM_HEIGHT / (2 * divisions);
-  
+
   for (let x = SIM_X_MIN; x <= SIM_X_MAX; x += stepX) {
     ctx.beginPath();
     ctx.moveTo(x, SIM_Y_MIN);
@@ -194,7 +175,7 @@ function drawGrid() {
       ctx.restore();
     }
   }
-  
+
   for (let y = SIM_Y_MIN; y <= SIM_Y_MAX; y += stepY) {
     ctx.beginPath();
     ctx.moveTo(SIM_X_MIN, y);
@@ -207,7 +188,7 @@ function drawGrid() {
       ctx.restore();
     }
   }
-  
+
   ctx.beginPath();
   ctx.moveTo(0, SIM_Y_MIN);
   ctx.lineTo(0, SIM_Y_MAX);
@@ -226,8 +207,6 @@ function drawRobot() {
   ctx.shadowBlur = 10;
   ctx.translate(pos.x, pos.y);
   ctx.rotate(robot.theta);
-  // Se dibuja la imagen de modo que su extremo derecho coincida con el punto de extensión dinámica.
-  // Se dibuja la imagen en x = robot.l - config.robotWidth.
   ctx.drawImage(robotImg, robot.l - config.robotWidth, -config.robotHeight / 2, config.robotWidth, config.robotHeight);
   ctx.restore();
 }
@@ -238,11 +217,9 @@ function drawTrajectory() {
   ctx.save();
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
-  // Grosor de la línea de trayectoria: 3/scaleFactor
   ctx.lineWidth = 3 / scaleFactor;
-  // Trazo en rojo constante
   ctx.strokeStyle = '#ff0000';
-  
+
   ctx.beginPath();
   ctx.moveTo(trajectory[0].x, trajectory[0].y);
   for (const point of trajectory) {
@@ -263,7 +240,6 @@ function drawPointsCircles() {
   drawCircle(extPoint.x, extPoint.y, '#FF0000');
 }
 
-// Se reduce el radio de los puntos a 3/scaleFactor
 function drawCircle(x, y, color) {
   ctx.beginPath();
   const actualWidth = canvas.width;
@@ -274,22 +250,21 @@ function drawCircle(x, y, color) {
 }
 
 function drawPointsLabels() {
-  // Para las etiquetas, usamos fuente 'bold 14px Arial'
   const actualWidth = canvas.width;
   const scaleFactor = actualWidth / SIM_WIDTH;
   const cx = actualWidth / 2;
   const cy = canvas.height / 2;
-  
+
   const startX = parseFloat(document.getElementById('startX').value);
   const startY = parseFloat(document.getElementById('startY').value);
   const endX = parseFloat(document.getElementById('endX').value);
   const endY = parseFloat(document.getElementById('endY').value);
-  
+
   const startCanvasX = cx + startX * scaleFactor;
   const startCanvasY = cy - startY * scaleFactor;
   const endCanvasX = cx + endX * scaleFactor;
   const endCanvasY = cy - endY * scaleFactor;
-  
+
   ctx.save();
   ctx.resetTransform();
   ctx.font = 'bold 14px Arial';
@@ -371,4 +346,15 @@ function animate() {
   WData.push(W);
   updateCharts(timeData, errorXData, errorYData, posXData, posYData, VData, WData);
   animationId = requestAnimationFrame(animate);
+}
+
+// Función para descargar la imagen actual del canvas de la animación
+function downloadCanvas() {
+  const dataURL = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'animacion_canvas.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
